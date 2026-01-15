@@ -46,3 +46,33 @@ function selectAnswer(answer) {
     }
     // Hier könnten wir später fetchQuestion() erneut aufrufen für die nächste Frage
 }
+
+function selectAnswer(answer) {
+    // 1. Alle Buttons im Grid finden
+    const buttons = document.querySelectorAll('#answer-buttons button');
+    
+    buttons.forEach(btn => {
+        btn.disabled = true; // Verhindert mehrfaches Klicken
+        
+        // Wir suchen den Button-Text, um zu wissen, welcher geklickt wurde
+        if (btn.innerText === answer.text) {
+            if (answer.isCorrect) {
+                btn.style.backgroundColor = 'var(--success)';
+                btn.style.color = 'white';
+            } else {
+                btn.style.backgroundColor = '#e74c3c'; // Rot für falsch
+                btn.style.color = 'white';
+            }
+        }
+    });
+
+    // 2. Den "Nächste Frage"-Button einblenden
+    const nextBtn = document.getElementById('next-btn');
+    nextBtn.classList.remove('hidden');
+}
+
+// Event Listener für den Next-Button (muss noch in app.js ans Ende)
+document.getElementById('next-btn').addEventListener('click', () => {
+    document.getElementById('next-btn').classList.add('hidden');
+    fetchQuestion(); // Lädt die nächste Zufallsfrage
+});
