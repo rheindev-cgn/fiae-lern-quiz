@@ -1,27 +1,30 @@
 <?php
+// Falls du Namespaces nutzt, hier: namespace App;
 
 class Database {
-    private $conn;
+    private $pdo;
 
     public function getConnection() {
-        $this->conn = null;
-        $config = require __DIR__ . '/../config/db_creds.php';
+        if ($this->pdo === null) {
+            try {
+                // Pfad von /src aus eine Ebene hoch zu / und dann in /config
+                $config = require __DIR__ . '/../config/db_creds.php';
 
-        try {
-            // DSN mit Port und Charset erweitern
-            $dsn = "mysql:host=" . $config['host'] . 
-                   ";port=" . $config['port'] . 
-                   ";dbname=" . $config['db_name'] . 
-                   ";charset=" . $config['charset'];
-            
-            $this->conn = new PDO($dsn, $config['user'], $config['pass']);
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch(PDOException $exception) {
-            error_log("Verbindungsfehler: " . $exception->getMessage());
-            echo "Verbindungsfehler: " . $exception->getMessage();
-            return null;
+                $dsn = "mysql:host=" . $config['host'] . 
+                       ";port=" . $config['port'] . 
+                       ";dbname=" . $config['database'] . 
+                       ";charset=" . $config['charset'];
+
+                $this->pdo = new PDO($dsn, $config['username'], $config['password'], [
+                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES   => false,
+                ]);
+
+            } catch (Exception $e) {
+                throw new Exception("DB-Verbindung fehlgeschlagen: " . $e->getMessage());
+            }
         }
-
-        return $this->conn;
+        return $this->pdo;
     }
 }

@@ -19,25 +19,16 @@ spl_autoload_register(function ($class) {
 
 require_once __DIR__ . '/../../src/Database.php';
 // ... restlicher Code
-use App\Repositories\QuestionRepository;
-
-// POST Daten empfangen (die gewählten Kategorien aus app.js)
-$data = json_decode(file_get_contents("php://input"), true);
-$selectedCategories = $data['categories'] ?? [];
 
 try {
-    $database = new \Database();
+    $database = new \Database(); // Backslash falls Database nicht im Namespace
     $db = $database->getConnection();
-    $repo = new QuestionRepository($db);
     
-    // Wir übergeben die gewählten IDs an das Repository
-    $question = $repo->getRandomQuestionFromSelection($selectedCategories);
-
-    if ($question) {
-        echo json_encode($question);
-    } else {
-        echo json_encode(['error' => 'Keine Fragen für diese Auswahl gefunden']);
-    }
+    // Einfache Abfrage der Kategorien
+    $stmt = $db->query("SELECT id, short_name, full_name FROM categories ORDER BY id ASC");
+    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    echo json_encode($categories);
 } catch (Exception $e) {
     echo json_encode(['error' => $e->getMessage()]);
 }

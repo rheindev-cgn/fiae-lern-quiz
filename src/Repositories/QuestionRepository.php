@@ -1,45 +1,47 @@
 <?php
 namespace App\Repositories;
 
-use App\Models\Question;
-use App\Models\Answer; // Neu hinzugefügt
 use PDO;
 
 class QuestionRepository {
     private $db;
 
-    public function __construct(PDO $db) {
+    public function __construct($db) {
         $this->db = $db;
     }
 
-    public function getRandomQuestion($isPremiumUser = false) {
-        // 1. Frage holen
-        $sql = "SELECT * FROM questions";
-        if (!$isPremiumUser) {
-            $sql .= " WHERE is_premium = 0";
+    public function getRandomQuestionFromSelection($categoryIds) {
+        // Falls nichts gewählt wurde, nehmen wir alle (Sicherheit)
+        $whereClause = "";
+        if (!empty($categoryIds)) {
+            $ids = implode(',', array_map('intval', $categoryIds));
+            $whereClause = "WHERE q.category_id IN ($ids)";
         }
-        $sql .= " ORDER BY RAND() LIMIT 1";
 
-        $stmt = $this->db->query($sql);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        // 1. Eine zufällige Frage holen
+        $query = "SELECT q.id, q.question_text, q.explanation, c.full_name as category_name 
+                  FROM questions q 
+                  JOIN categories c ON q.category_id = c.id 
+                  $whereClause 
+                  ORDER BY RAND() LIMIT 1";
+        
+        $stmt = $this->db->query($query);
+        $question = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$row) return null;
+        if (!$question) return null;
 
-        $question = new Question($row['id'], $row['question_text'], $row['category_id'], $row['is_premium']);
+        // 2. Die 4 Antworten dazu holen
+        $stmtAnswers = $this->db->prepare("SELECT answer_text as text, is_correct FROM answers WHERE question_id = ?");
+        $stmtAnswers->execute([$question['id']]);
+        $answers = $stmtAnswers->fetchAll(PDO::FETCH_ASSOC);
 
-        // 2. Passende Antworten laden (JOIN oder separate Abfrage)
-        $this->loadAnswersForQuestion($question);
-
-        return $question;
-    }
-
-    private function loadAnswersForQuestion(Question $question) {
-        $sql = "SELECT * FROM answers WHERE question_id = :qid";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['qid' => $question->id]);
-
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $question->answers[] = new Answer($row['id'], $row['answer_text'], $row['is_correct']);
-        }
+        // Format für das Frontend (app.js) aufbereiten
+        return [
+            'id' => $question['id'],
+            'text' => $question['question_text'],
+            'explanation' => $question['explanation'],
+            'category_name' => $question['category_name'],
+            'answers' => $answers
+        ];
     }
 }

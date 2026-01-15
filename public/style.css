@@ -1,16 +1,14 @@
 :root {
     --primary: #2c3e50;      /* Dunkles Blau/Grau */
     --accent: #3498db;       /* Helles Blau */
-    --success: #27ae60;      /* Erfolg-Grün */
+    --success: #45AC42;      /* Dein Wunsch-Grün */
     --error: #e74c3c;        /* Fehler-Rot */
-    --bg: #f8f9fa;           /* Sehr helles Grau */
+    --bg: #f0f2f5;           /* Etwas weicheres Grau */
     --text: #333;
     --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     font-family: 'Inter', -apple-system, sans-serif;
@@ -20,37 +18,105 @@ body {
     line-height: 1.6;
 }
 
+/* --- Header & Navigation --- */
 header {
     background: var(--primary);
     color: white;
-    padding: 1.5rem;
-    text-align: center;
+    padding: 1rem 2rem;
     box-shadow: var(--shadow);
 }
 
+.header-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between; /* Schiebt Login nach rechts */
+    align-items: center;
+}
+
+h1 { margin: 0; font-size: 1.5rem; }
+
+/* --- Layout Container --- */
 #app {
-    max-width: 700px;
+    max-width: 800px;
     width: 95%;
-    margin: 3rem auto;
+    margin: 2rem auto;
     background: white;
-    padding: 2.5rem;
+    padding: 2rem;
     border-radius: 12px;
     box-shadow: var(--shadow);
 }
 
-h2, h3 {
-    color: var(--primary);
-    margin-top: 0;
+/* --- Kacheln (Category Grid) --- */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+    margin: 1.5rem 0;
 }
 
-/* Button-Styling */
-.btn-grid {
+.category-card {
+    background: #fff;
+    border: 2px solid #ecf0f1;
+    border-radius: 10px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.category-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+}
+
+.category-card.selected {
+    border-color: var(--accent);
+    background-color: #ebf5fb;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+}
+
+.category-card h4 {
+    margin: 0 0 5px 0;
+    color: var(--accent);
+}
+
+.category-card p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* --- Quiz Meta (Kategorie & Zähler) --- */
+.quiz-meta {
     display: flex;
-    flex-direction: column; /* Mobil-freundlich */
-    gap: 12px;
-    margin: 2rem 0;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    font-weight: bold;
 }
 
+#category-badge {
+    background: var(--accent);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 15px;
+}
+
+/* --- Erklärungs-Box --- */
+.explanation-box {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #fff9db; /* Helles Gelb für Info-Charakter */
+    border-left: 5px solid #f1c40f;
+    border-radius: 5px;
+    animation: fadeIn 0.5s ease;
+}
+
+.explanation-box h4 { margin: 0 0 5px 0; color: #856404; }
+.explanation-box p { margin: 0; font-size: 0.95rem; }
+
+/* --- Buttons --- */
 button {
     font-size: 1rem;
     padding: 12px 20px;
@@ -58,73 +124,40 @@ button {
     background: white;
     cursor: pointer;
     border-radius: 8px;
-    transition: all 0.2s ease-in-out;
-    text-align: left;
+    transition: all 0.2s;
     font-weight: 500;
 }
 
-button:hover:not(:disabled) {
-    border-color: var(--accent);
-    background-color: #f0f7fc;
-    transform: translateY(-2px);
-}
-
-button:disabled {
-    cursor: not-allowed;
-}
-
-/* Spezielle Button-Klassen */
 .btn-primary {
     background-color: var(--accent);
     color: white;
     border: none;
-    text-align: center;
-    display: block;
     width: 100%;
+    margin-top: 10px;
 }
 
-.btn-primary:hover {
-    background-color: #2980b9;
-}
+.btn-primary:hover:not(:disabled) { background-color: #2980b9; }
+.btn-primary:disabled { background-color: #bdc3c7; cursor: not-allowed; }
 
-#next-btn {
-    margin-top: 1rem;
-    background-color: var(--primary);
-    color: white;
-    width: 100%;
-    text-align: center;
-}
-
-/* Utilities */
-.hidden { display: none; }
-
-.correct {
-    background-color: var(--success) !important;
-    border-color: var(--success) !important;
-    color: white !important;
-}
-
-.wrong {
-    background-color: var(--error) !important;
-    border-color: var(--error) !important;
-    color: white !important;
-}
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 1rem;
-}
-
-input {
-    padding: 12px;
-    border: 2px solid #ecf0f1;
-    border-radius: 8px;
-    font-size: 1rem;
-}
-
-.error-text {
-    color: var(--error);
-    font-weight: bold;
+.btn-secondary {
+    background-color: #ecf0f1;
+    color: var(--primary);
+    border: none;
     font-size: 0.9rem;
+}
+
+.btn-small { padding: 6px 15px; font-size: 0.9rem; }
+
+/* --- Antwort-Status --- */
+.correct { background-color: var(--success) !important; color: white !important; border-color: var(--success) !important; }
+.wrong { background-color: var(--error) !important; color: white !important; border-color: var(--error) !important; }
+
+/* --- Utilities --- */
+.hidden { display: none; }
+.settings-container { margin: 1.5rem 0; padding: 10px; background: #f8f9fa; border-radius: 8px; }
+input[type="range"] { width: 100%; margin-top: 10px; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }

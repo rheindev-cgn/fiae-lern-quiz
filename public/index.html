@@ -10,36 +10,65 @@
 
 <body>
     <header>
-        <h1>FIAE Lern-Quiz</h1>
-        <nav id="main-nav">
-        </nav>
+        <div class="header-content">
+            <h1>FIAE Lern-Quiz</h1>
+            <div id="user-status">
+                <button id="header-login-btn" class="btn-small">Login</button>
+            </div>
+        </div>
     </header>
 
     <main id="app">
-        <section id="login-screen">
+        <section id="login-screen" class="hidden">
             <h2>Login</h2>
             <div class="form-group">
                 <input type="text" id="login-username" placeholder="Benutzername">
                 <input type="password" id="login-password" placeholder="Passwort">
                 <button id="login-submit-btn" class="btn-primary">Anmelden</button>
+                <button id="login-back-btn" class="btn-secondary">Zurück</button>
             </div>
             <p id="login-error" class="error-text hidden"></p>
         </section>
+
         <section id="start-screen">
-            <h2>Bereit für die AP1/AP2?</h2>
-            <p>Teste dein Wissen in verschiedenen FIAE-Themengebieten.</p>
-            <button id="start-quiz-btn" class="btn-primary">Jetzt Quiz starten (Gast)</button>
+            <h2>Bereit für die Prüfung?</h2>
+            <p>Wähle deine Lernfelder und die Anzahl der Fragen aus.</p>
+
+            <div class="settings-container">
+                <label for="question-range">Anzahl der Fragen: <span id="range-value">25</span></label>
+                <input type="range" id="question-range" min="10" max="50" step="5" value="25">
+            </div>
+
+            <div class="selection-controls">
+                <button id="select-all-btn" class="btn-secondary">Alle Lernfelder auswählen</button>
+            </div>
+
+            <div id="category-grid" class="category-grid">
+                <p>Lade Lernfelder...</p>
+            </div>
+
+            <button id="start-quiz-btn" class="btn-primary" disabled>Quiz mit Auswahl starten</button>
         </section>
 
         <section id="quiz-screen" class="hidden">
             <div id="question-container">
+                <div class="quiz-meta">
+                    <span id="category-badge">Kategorie</span>
+                    <span id="question-counter">Frage 1/X</span>
+                </div>
                 <h3 id="question-text">Fragetext wird geladen...</h3>
+                
                 <div id="answer-buttons" class="btn-grid">
+                    </div>
+
+                <div id="explanation-container" class="explanation-box hidden">
+                    <h4>💡 Prüfungswissen</h4>
+                    <p id="explanation-text"></p>
                 </div>
             </div>
+
             <div id="quiz-footer">
-                <p>Kategorie: <span id="category-name">-</span></p>
-                <button id="next-btn" class="hidden">Nächste Frage</button>
+                <button id="next-btn" class="hidden btn-primary">Nächste Frage</button>
             </div>
         </section>
     </main>

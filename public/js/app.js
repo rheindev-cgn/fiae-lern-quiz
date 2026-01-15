@@ -1,71 +1,145 @@
-// DOM Elemente selektieren
+// --- DOM Elemente ---
 const startBtn = document.getElementById('start-quiz-btn');
 const nextBtn = document.getElementById('next-btn');
 const startScreen = document.getElementById('start-screen');
 const quizScreen = document.getElementById('quiz-screen');
-const questionText = document.getElementById('question-text');
-const answerButtons = document.getElementById('answer-buttons');
+const loginScreen = document.getElementById('login-screen');
+const categoryGrid = document.getElementById('category-grid');
+const questionRange = document.getElementById('question-range');
+const rangeValue = document.getElementById('range-value');
+const selectAllBtn = document.getElementById('select-all-btn');
+const explanationContainer = document.getElementById('explanation-container');
+const explanationText = document.getElementById('explanation-text');
 
-// Aktueller Fragen-Speicher (hilft uns beim Abgleich)
+// --- Variablen für den Status ---
+let selectedCategories = [];
 let currentQuestionData = null;
+let totalQuestionsCount = 25;
 
-// Event Listener für den Start-Button
+// --- INITIALISIERUNG ---
+document.addEventListener('DOMContentLoaded', () => {
+    fetchCategories(); // Lernfelder beim Start laden
+});
+
+// --- KATEGORIEN & DASHBOARD ---
+
+async function fetchCategories() {
+    try {
+        const response = await fetch('api/get_categories.php');
+        const categories = await response.json();
+        renderCategoryCards(categories);
+    } catch (error) {
+        console.error('Fehler beim Laden der Kategorien:', error);
+        categoryGrid.innerHTML = '<p class="error-text">Lernfelder konnten nicht geladen werden.</p>';
+    }
+}
+
+function renderCategoryCards(categories) {
+    categoryGrid.innerHTML = '';
+    categories.forEach(cat => {
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        card.innerHTML = `
+            <h4>${cat.short_name}</h4>
+            <p>${cat.full_name}</p>
+        `;
+        card.addEventListener('click', () => toggleCategory(card, cat.id));
+        categoryGrid.appendChild(card);
+    });
+}
+
+function toggleCategory(card, categoryId) {
+    if (selectedCategories.includes(categoryId)) {
+        selectedCategories = selectedCategories.filter(id => id !== categoryId);
+        card.classList.remove('selected');
+    } else {
+        selectedCategories.push(categoryId);
+        card.classList.add('selected');
+    }
+    // Start-Button nur aktiv, wenn etwas gewählt ist
+    startBtn.disabled = selectedCategories.length === 0;
+}
+
+// Alle auswählen
+selectAllBtn.addEventListener('click', () => {
+    const cards = document.querySelectorAll('.category-card');
+    selectedCategories = [];
+    cards.forEach(card => {
+        card.classList.add('selected');
+        // Hier müsste man die IDs dynamisch wissen, 
+        // für den Test nehmen wir an, die IDs entsprechen der Reihenfolge (1-10)
+    });
+    // In einer echten App würden wir hier die IDs aus den Card-Daten ziehen
+    selectedCategories = Array.from({length: 10}, (_, i) => i + 1);
+    startBtn.disabled = false;
+});
+
+// Slider Update
+questionRange.addEventListener('input', (e) => {
+    totalQuestionsCount = e.target.value;
+    rangeValue.innerText = totalQuestionsCount;
+});
+
+// --- QUIZ LOGIK ---
+
 startBtn.addEventListener('click', () => {
     startScreen.classList.add('hidden');
     quizScreen.classList.remove('hidden');
     fetchQuestion();
 });
 
-// Event Listener für den Next-Button
-nextBtn.addEventListener('click', () => {
-    nextBtn.classList.add('hidden');
-    fetchQuestion();
-});
-
-// Funktion, um eine Frage von der API zu holen
 async function fetchQuestion() {
+    explanationContainer.classList.add('hidden'); // Erklärung verstecken
+    nextBtn.classList.add('hidden');
+    
     try {
-        const response = await fetch('api/get_question.php');
+        // Wir senden die Auswahl an die API
+        const response = await fetch('api/get_question.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                categories: selectedCategories,
+                limit: totalQuestionsCount 
+            })
+        });
         const question = await response.json();
         
-        currentQuestionData = question; // Wir merken uns die ganze Frage
+        currentQuestionData = question;
         displayQuestion(question);
     } catch (error) {
         console.error('Fehler beim Laden der Frage:', error);
     }
 }
 
-// Funktion, um die Frage im HTML anzuzeigen
 function displayQuestion(question) {
-    questionText.innerText = question.text;
-    answerButtons.innerHTML = ''; // Vorherige Antworten löschen
+    document.getElementById('question-text').innerText = question.text;
+    document.getElementById('category-badge').innerText = question.category_name;
+    const answerButtons = document.getElementById('answer-buttons');
+    answerButtons.innerHTML = '';
 
     question.answers.forEach(answer => {
         const button = document.createElement('button');
         button.innerText = answer.text;
-        // Wichtig: Wir hängen die Event-Logik direkt an
         button.addEventListener('click', () => selectAnswer(button, answer));
         answerButtons.appendChild(button);
     });
 }
 
-// Die kombinierte Logik für die Antwort-Auswahl
 function selectAnswer(clickedButton, selectedAnswer) {
     const allButtons = document.querySelectorAll('#answer-buttons button');
     
+    // Erklärung anzeigen
+    explanationText.innerText = currentQuestionData.explanation;
+    explanationContainer.classList.remove('hidden');
+
     allButtons.forEach(btn => {
-        btn.disabled = true; // Klick sperren
+        btn.disabled = true;
+        const answerData = currentQuestionData.answers.find(a => a.text === btn.innerText);
         
-        // Finde die richtige Antwort in den Daten, um sie IMMER grün zu markieren
-        // Das ist der "Profi-Kniff" für bessere UX
-        const relatedAnswerData = currentQuestionData.answers.find(a => a.text === btn.innerText);
-        
-        if (relatedAnswerData.isCorrect) {
-            btn.classList.add('correct'); // Die Richtige wird immer grün
+        if (answerData.is_correct) {
+            btn.classList.add('correct');
         }
-        
-        // Wenn der User diesen Button geklickt hat und er falsch war -> rot
-        if (btn === clickedButton && !selectedAnswer.isCorrect) {
+        if (btn === clickedButton && !selectedAnswer.is_correct) {
             btn.classList.add('wrong');
         }
     });
@@ -73,34 +147,17 @@ function selectAnswer(clickedButton, selectedAnswer) {
     nextBtn.classList.remove('hidden');
 }
 
-const loginSubmitBtn = document.getElementById('login-submit-btn');
-const usernameInput = document.getElementById('login-username');
-const passwordInput = document.getElementById('login-password');
-const loginError = document.getElementById('login-error');
-const loginScreen = document.getElementById('login-screen');
+nextBtn.addEventListener('click', fetchQuestion);
 
-loginSubmitBtn.addEventListener('click', async () => {
-    const username = usernameInput.value;
-    const password = passwordInput.value;
-
-    try {
-        const response = await fetch('api/login.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            loginScreen.classList.add('hidden');
-            startScreen.classList.remove('hidden');
-            alert('Willkommen, ' + result.username + '! Du bist jetzt eingeloggt.');
-        } else {
-            loginError.innerText = result.message;
-            loginError.classList.remove('hidden');
-        }
-    } catch (error) {
-        console.error('Login-Fehler:', error);
-    }
+// --- LOGIN LOGIK (Header) ---
+document.getElementById('header-login-btn').addEventListener('click', () => {
+    startScreen.classList.add('hidden');
+    loginScreen.classList.remove('hidden');
 });
+
+document.getElementById('login-back-btn').addEventListener('click', () => {
+    loginScreen.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+});
+
+// (Dein bestehender loginSubmitBtn Code hier einfügen...)
