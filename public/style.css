@@ -1,56 +1,111 @@
 :root {
-    --primary: #2c3e50;
-    --accent: #3498db;
-    --success: #27ae60;
-    --bg: #f4f7f6;
+    --primary: #2c3e50;      /* Dunkles Blau/Grau */
+    --accent: #3498db;       /* Helles Blau */
+    --success: #27ae60;      /* Erfolg-Grün */
+    --error: #e74c3c;        /* Fehler-Rot */
+    --bg: #f8f9fa;           /* Sehr helles Grau */
+    --text: #333;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', -apple-system, sans-serif;
     background-color: var(--bg);
+    color: var(--text);
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    line-height: 1.6;
 }
 
 header {
     background: var(--primary);
     color: white;
-    width: 100%;
-    padding: 1rem;
+    padding: 1.5rem;
     text-align: center;
+    box-shadow: var(--shadow);
 }
 
 #app {
-    max-width: 800px;
-    width: 90%;
-    margin: 2rem auto;
+    max-width: 700px;
+    width: 95%;
+    margin: 3rem auto;
     background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
 }
 
-.hidden { display: none; }
+h2, h3 {
+    color: var(--primary);
+    margin-top: 0;
+}
 
+/* Button-Styling */
 .btn-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 20px;
+    display: flex;
+    flex-direction: column; /* Mobil-freundlich */
+    gap: 12px;
+    margin: 2rem 0;
 }
 
 button {
-    padding: 15px;
-    border: 1px solid var(--accent);
+    font-size: 1rem;
+    padding: 12px 20px;
+    border: 2px solid #ecf0f1;
     background: white;
     cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.2s;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    text-align: left;
+    font-weight: 500;
 }
 
-button:hover {
-    background: var(--accent);
+button:hover:not(:disabled) {
+    border-color: var(--accent);
+    background-color: #f0f7fc;
+    transform: translateY(-2px);
+}
+
+button:disabled {
+    cursor: not-allowed;
+}
+
+/* Spezielle Button-Klassen */
+.btn-primary {
+    background-color: var(--accent);
     color: white;
+    border: none;
+    text-align: center;
+    display: block;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+#next-btn {
+    margin-top: 1rem;
+    background-color: var(--primary);
+    color: white;
+    width: 100%;
+    text-align: center;
+}
+
+/* Utilities */
+.hidden { display: none; }
+
+.correct {
+    background-color: var(--success) !important;
+    border-color: var(--success) !important;
+    color: white !important;
+}
+
+.wrong {
+    background-color: var(--error) !important;
+    border-color: var(--error) !important;
+    color: white !important;
 }
