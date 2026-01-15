@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIAE Quiz - Dein Lernbegleiter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>FIAE Lern-Quiz</h1>
+        <nav id="main-nav">
+            </nav>
+    </header>
+
+    <main id="app">
+        <section id="start-screen">
+            <h2>Bereit für die AP1/AP2?</h2>
+            <p>Teste dein Wissen in verschiedenen FIAE-Themengebieten.</p>
+            <button id="start-quiz-btn" class="btn-primary">Jetzt Quiz starten (Gast)</button>
+        </section>
+
+        <section id="quiz-screen" class="hidden">
+            <div id="question-container">
+                <h3 id="question-text">Fragetext wird geladen...</h3>
+                <div id="answer-buttons" class="btn-grid">
+                    </div>
+            </div>
+            <div id="quiz-footer">
+                <p>Kategorie: <span id="category-name">-</span></p>
+                <button id="next-btn" class="hidden">Nächste Frage</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
