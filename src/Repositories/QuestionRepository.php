@@ -2,6 +2,7 @@
 namespace App\Repositories;
 
 use App\Models\Question;
+use App\Models\Answer; // Neu hinzugefügt
 use PDO;
 
 class QuestionRepository {
@@ -11,15 +12,12 @@ class QuestionRepository {
         $this->db = $db;
     }
 
-    // Holt eine zufällige Frage basierend auf dem Status (Premium oder Gast)
     public function getRandomQuestion($isPremiumUser = false) {
+        // 1. Frage holen
         $sql = "SELECT * FROM questions";
-        
-        // Wenn kein Premium-Nutzer, zeige nur Nicht-Premium-Fragen
         if (!$isPremiumUser) {
             $sql .= " WHERE is_premium = 0";
         }
-        
         $sql .= " ORDER BY RAND() LIMIT 1";
 
         $stmt = $this->db->query($sql);
@@ -27,6 +25,21 @@ class QuestionRepository {
 
         if (!$row) return null;
 
-        return new Question($row['id'], $row['question_text'], $row['category_id'], $row['is_premium']);
+        $question = new Question($row['id'], $row['question_text'], $row['category_id'], $row['is_premium']);
+
+        // 2. Passende Antworten laden (JOIN oder separate Abfrage)
+        $this->loadAnswersForQuestion($question);
+
+        return $question;
+    }
+
+    private function loadAnswersForQuestion(Question $question) {
+        $sql = "SELECT * FROM answers WHERE question_id = :qid";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['qid' => $question->id]);
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $question->answers[] = new Answer($row['id'], $row['answer_text'], $row['is_correct']);
+        }
     }
 }
