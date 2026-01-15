@@ -1,28 +1,26 @@
 <?php
 
 class Database {
-    private $host = "127.0.0.1";
-    private $db_name = "fiae_quiz";
-    private $username = "root"; // Standard bei WAMPP
-    private $password = "";     // Standard bei WAMPP oft leer
-    public $conn;
+    private $conn;
 
-    // Methode, um die Verbindung herzustellen
     public function getConnection() {
         $this->conn = null;
 
+        // Wir laden die Zugangsdaten relativ zum Speicherort dieser Datei
+        $config = require __DIR__ . '/../config/db_creds.php';
+
         try {
             $this->conn = new PDO(
-                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
-                $this->username,
-                $this->password
+                "mysql:host=" . $config['host'] . ";dbname=" . $config['db_name'],
+                $config['user'],
+                $config['pass']
             );
-            // Setze den Fehlermodus auf Exception, damit wir Fehler abfangen können
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            // Support für Umlaute (wichtig für deutsche Fragen!)
             $this->conn->exec("set names utf8");
         } catch(PDOException $exception) {
-            echo "Verbindungsfehler: " . $exception->getMessage();
+            // Im Profi-Umfeld würden wir das in ein Log schreiben, statt es per echo auszugeben
+            error_log("Verbindungsfehler: " . $exception->getMessage());
+            return null;
         }
 
         return $this->conn;
