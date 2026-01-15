@@ -1,0 +1,9 @@
+# Datenbank-Konfiguration (enthält später Passwörter!)
+config/db_creds.php
+
+# Betriebssystem-Dateien
+.DS_Store
+Thumbs.db
+
+# VS Code Einstellungen
+.vscode/
