@@ -72,3 +72,35 @@ function selectAnswer(clickedButton, selectedAnswer) {
 
     nextBtn.classList.remove('hidden');
 }
+
+const loginSubmitBtn = document.getElementById('login-submit-btn');
+const usernameInput = document.getElementById('login-username');
+const passwordInput = document.getElementById('login-password');
+const loginError = document.getElementById('login-error');
+const loginScreen = document.getElementById('login-screen');
+
+loginSubmitBtn.addEventListener('click', async () => {
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+
+    try {
+        const response = await fetch('api/login.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            loginScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            alert('Willkommen, ' + result.username + '! Du bist jetzt eingeloggt.');
+        } else {
+            loginError.innerText = result.message;
+            loginError.classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('Login-Fehler:', error);
+    }
+});

@@ -109,3 +109,22 @@ button:disabled {
     border-color: var(--error) !important;
     color: white !important;
 }
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+input {
+    padding: 12px;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.error-text {
+    color: var(--error);
+    font-weight: bold;
+    font-size: 0.9rem;
+}
