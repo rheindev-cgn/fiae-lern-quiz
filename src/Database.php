@@ -5,21 +5,20 @@ class Database {
 
     public function getConnection() {
         $this->conn = null;
-
-        // Wir laden die Zugangsdaten relativ zum Speicherort dieser Datei
         $config = require __DIR__ . '/../config/db_creds.php';
 
         try {
-            $this->conn = new PDO(
-                "mysql:host=" . $config['host'] . ";dbname=" . $config['db_name'],
-                $config['user'],
-                $config['pass']
-            );
+            // DSN mit Port und Charset erweitern
+            $dsn = "mysql:host=" . $config['host'] . 
+                   ";port=" . $config['port'] . 
+                   ";dbname=" . $config['db_name'] . 
+                   ";charset=" . $config['charset'];
+            
+            $this->conn = new PDO($dsn, $config['user'], $config['pass']);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->conn->exec("set names utf8");
         } catch(PDOException $exception) {
-            // Im Profi-Umfeld würden wir das in ein Log schreiben, statt es per echo auszugeben
             error_log("Verbindungsfehler: " . $exception->getMessage());
+            echo "Verbindungsfehler: " . $exception->getMessage();
             return null;
         }
 
