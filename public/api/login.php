@@ -16,7 +16,7 @@ spl_autoload_register(function ($class) {
 require_once __DIR__ . '/../../src/Database.php';
 use App\Repositories\UserRepository;
 
-// Wir lesen die JSON-Daten aus dem Request-Body
+// Auslesen der JSON-Daten aus dem Request-Body
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (!isset($data['username']) || !isset($data['password'])) {
@@ -32,7 +32,7 @@ try {
     $userData = $repo->findByUsername($data['username']);
 
     if ($userData && password_verify($data['password'], $userData['password_hash'])) {
-        // Login erfolgreich! Wir speichern die User-ID in der Session
+        // Login erfolgreich! User ID wird in der Session gespeichert
         $_SESSION['user_id'] = $userData['id'];
         $_SESSION['role_id'] = $userData['role_id'];
         $_SESSION['username'] = $userData['username'];

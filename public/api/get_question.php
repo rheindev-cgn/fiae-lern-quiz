@@ -30,7 +30,7 @@ try {
     $db = $database->getConnection();
     $repo = new QuestionRepository($db);
     
-    // Wir übergeben die gewählten IDs an das Repository
+    // IDs and Repository übergeben, damit die Methode weiß, welche Fragen sie ziehen soll
     $question = $repo->getRandomQuestionFromSelection($selectedCategories);
 
     if ($question) {

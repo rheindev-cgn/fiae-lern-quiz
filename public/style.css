@@ -161,3 +161,96 @@ input[type="range"] { width: 100%; margin-top: 10px; }
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* --- 1. Logo-Link Fix (Gegen das lila Leuchten) --- */
+.logo-link, .logo-link:visited, .logo-link:active {
+    text-decoration: none !important;
+    color: white !important;
+}
+
+.logo-link h1 {
+    color: white !important;
+    margin: 0;
+}
+
+/* --- 2. Wer wird Millionär Antwort-Grid --- */
+#answer-buttons {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobil: Eine Spalte */
+    gap: 15px;
+    margin: 25px 0;
+    width: 100%;
+}
+
+/* Ab Desktop (600px): Zwei Spalten für das Quiz-Show-Feeling */
+@media (min-width: 600px) {
+    #answer-buttons {
+        grid-template-columns: 1fr 1fr;
+        column-gap: 30px;
+        row-gap: 20px;
+    }
+}
+
+/* Die Antwort-Buttons spezifisch stylen */
+.answer-btn {
+    background: white;
+    border: 2px solid var(--accent);
+    color: var(--text);
+    padding: 15px 25px;
+    border-radius: 50px; /* Die typische Pillenform */
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.answer-btn:hover:not(:disabled) {
+    background-color: var(--accent);
+    color: white;
+    transform: scale(1.02);
+    box-shadow: 0 6px 12px rgba(52, 152, 219, 0.2);
+}
+
+/* --- 3. Status-Farben (überschreibt Standard-Hover) --- */
+.answer-btn.correct {
+    background-color: var(--success) !important;
+    border-color: #3d963a !important; /* Etwas dunkleres Grün für den Rand */
+    color: white !important;
+}
+
+.answer-btn.wrong {
+    background-color: var(--error) !important;
+    border-color: #c0392b !important;
+    color: white !important;
+}
+
+/* Button-Text während der Auflösung fixieren */
+.answer-btn:disabled {
+    cursor: default;
+    opacity: 1; 
+}
+
+/* --- Zentrierung der Frage --- */
+#question-text {
+    text-align: center;      /* Text zentrieren */
+    font-size: 1.4rem;       /* Etwas größer für mehr Fokus */
+    font-weight: 700;        /* Fettgedruckt */
+    margin: 2rem auto;       /* Abstand nach oben/unten und horizontal zentrieren */
+    max-width: 90%;          /* Verhindert, dass der Text am Rand klebt */
+    color: var(--primary);   /* Nutzt dein dunkles Blau */
+    line-height: 1.4;
+}
+
+/* Optional: Den Badge (Kategorie) ebenfalls zentrieren, falls gewünscht */
+.quiz-meta {
+    display: flex;
+    justify-content: center; /* Badge und Counter mittig ausrichten */
+    gap: 20px;               /* Abstand zwischen Badge und Counter */
+    margin-bottom: 1rem;
+}
